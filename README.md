@@ -3,7 +3,7 @@
 This repository will contain the code to reproduce the results from the
 manuscript:
 
-**Scan-Adaptive Subset-Based MRI Undersampling Using a Dictionary of Learned Patterns**
+**Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns**
 
 The paper is currently under review at *Magnetic Resonance in Medicine*.
 In accordance with the journal’s reproducibility guidelines, the code will
