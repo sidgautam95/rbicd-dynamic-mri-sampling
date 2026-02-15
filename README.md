@@ -10,8 +10,7 @@ Official Python implementation accompanying the paper:
 **Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili, Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
 *Under review at Magnetic Resonance in Medicine (MRM)*
 
-📄 **arXiv:** https://arxiv.org/abs/XXXX.XXXXX *(update once live)*  
-🧾 **MRM Manuscript ID:** MRM-26-26740 *(optional: keep/remove)*
+📄 **arXiv:** https://arxiv.org/abs/XXXX.XXXXX  
 
 ---
 
