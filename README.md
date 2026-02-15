@@ -22,9 +22,6 @@ Dynamic cardiac cine MRI is often limited by long acquisition times. This reposi
 2. **Selects a scan-adaptive mask at test time** using a **nearest-neighbor search in low-frequency k-space**, then applies it across the entire dynamic series.  
 3. Reconstructs the undersampled series using **MostNet**, an unrolled optimization network that combines a learned spatiotemporal prior with **conjugate-gradient data consistency**.
 
-(High-level method + reported gains: PSNR improvements of ~2â€“3 dB, reduced NMSE, increased SSIM; also improved radiologist ratings.)  
-:contentReference[oaicite:3]{index=3}
-
 ---
 
 ## Method Summary
@@ -36,7 +33,6 @@ MostNet reconstructs a dynamic image series \(x \in \mathbb{C}^{n \times N_t}\) 
 y_i = M F S_i x,
 \]
 where \(M\) is the sampling mask, \(F\) is the 2D spatial Fourier transform (per frame), and \(S_i\) is the coil sensitivity operator.  
-:contentReference[oaicite:4]{index=4}
 
 MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
 \[
@@ -46,12 +42,10 @@ where the denoiser \(\tilde{\mathcal{D}}_\theta\) is a **dual-domain CRNN** (xâ€
 \[
 \tilde{\mathcal{D}}_\theta(x)=\gamma\,D_{xt}(x) + (1-\gamma)\,F_t^{-1}\!\left(D_{xf}(F_t x)\right).
 \]
-:contentReference[oaicite:5]{index=5}
 
 Unrolling (K stages): at stage \(k\), apply denoising then a **CG-based data-consistency** update:
 - \(z^k = \tilde{\mathcal{D}}_\theta(x^k)\)
 - \(x^{k+1} = \arg\min_x \sum_i \|MFS_i x - y_i\|_2^2 + \lambda\|x-z^k\|_2^2\) (solved with a fixed number of CG iterations)  
-:contentReference[oaicite:6]{index=6}
 
 ---
 
@@ -62,14 +56,12 @@ We jointly learn:
 - a reconstruction network \(f_\theta\) trained across those learned patterns,
 
 via **alternating optimization**: update masks for fixed reconstruction, then update \(\theta\) for fixed masks.  
-:contentReference[oaicite:7]{index=7}
 
 ---
 
 ### 3) RB-ICD: Randomized Subset-Based ICD (Mask Optimization)
 
 Updating one phase-encoding line at a time is expensive for dynamic cine data because each candidate evaluation requires reconstructing an entire multi-frame series. RB-ICD accelerates this by **updating multiple phase-encoding locations simultaneously** (subset updates).  
-:contentReference[oaicite:8]{index=8}
 
 **Algorithm sketch (Algorithm 1 in paper):**
 - Start from an initial mask \(M_{\text{init}}\) and enforce a fixed low-frequency ACS set \(\Omega_{\text{low}}\).
@@ -79,7 +71,6 @@ Updating one phase-encoding line at a time is expensive for dynamic cine data be
     - Sample \(N_{\text{cand}}\) candidate relocations to unsampled locations,
     - Reconstruct and evaluate loss for each candidate,
     - Accept the best candidate if it improves the current loss.  
-:contentReference[oaicite:9]{index=9}
 
 ---
 
