@@ -1,82 +1,101 @@
-# dSUNO / RB-ICD: Scan-Adaptive Dynamic MRI Undersampling
+# dSUNO / RB-ICD for Scan-Adaptive Dynamic MRI Sampling
 
-[![arXiv](https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![arXiv](https://img.shields.io/badge/arXiv-TBD-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
 
 Official Python implementation accompanying the paper:
 
+**Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns**  
 **Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili, Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
+*Under review at Magnetic Resonance in Medicine (MRM)*
 
-*Preprint (arXiv), 2026*
-
-📄 **arXiv:** https://arxiv.org/abs/XXXX.XXXXX  
+📄 **arXiv:** https://arxiv.org/abs/XXXX.XXXXX *(update once live)*  
+🧾 **MRM Manuscript ID:** MRM-26-26740 *(optional: keep/remove)*
 
 ---
 
 ## Overview
 
-This work proposes a scan-adaptive framework for accelerating dynamic cardiac MRI using a dictionary of efficiently learned Cartesian undersampling patterns.
+Dynamic cardiac cine MRI is often limited by long acquisition times. This repository implements a **scan-/slice-adaptive Cartesian undersampling** framework for dynamic MRI that:
 
-Given fully sampled training dynamic MRI data, we learn a dictionary of optimized sampling masks using a randomized batched iterative coordinate descent (RB-ICD) algorithm.  
-At test time, a nearest-neighbor search in low-frequency $k$-space selects an appropriate sampling pattern for each scan. The framework enables improved reconstruction quality while maintaining practical computational efficiency.
+1. **Learns a dictionary of optimized sampling masks** from fully sampled training cine time-series.
+2. **Selects a scan-adaptive mask at test time** using a **nearest-neighbor search in low-frequency k-space**, then applies it across the entire dynamic series.  
+3. Reconstructs the undersampled series using **MostNet**, an unrolled optimization network that combines a learned spatiotemporal prior with **conjugate-gradient data consistency**.
 
----
-
-## RB-ICD Sampling Optimization Framework
-
-The RB-ICD algorithm performs subset-wise optimization of Cartesian sampling masks by iteratively evaluating candidate updates guided by a reconstruction network.
-
-<p align="center">
-  <img src="figures/rbicd_pipeline.png" alt="RB-ICD pipeline" />
-</p>
+(High-level method + reported gains: PSNR improvements of ~2–3 dB, reduced NMSE, increased SSIM; also improved radiologist ratings.)  
+:contentReference[oaicite:3]{index=3}
 
 ---
 
-## Scan-Adaptive Mask Selection (Nearest Neighbor Search)
+## Method Summary
 
-At inference time, we select a scan-adaptive mask by comparing low-frequency reconstructions between test and training scans.
+### 1) MostNet: Model-Based Spatiotemporal Network (Reconstruction)
 
-<p align="center">
-  <img src="figures/nearest_neighbor_pipeline.png" alt="Nearest neighbor search" />
-</p>
+MostNet reconstructs a dynamic image series \(x \in \mathbb{C}^{n \times N_t}\) from undersampled multi-coil measurements using the forward model:
+\[
+y_i = M F S_i x,
+\]
+where \(M\) is the sampling mask, \(F\) is the 2D spatial Fourier transform (per frame), and \(S_i\) is the coil sensitivity operator.  
+:contentReference[oaicite:4]{index=4}
+
+MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
+\[
+\arg\min_x \sum_{i=1}^{n_c}\|MFS_i x - y_i\|_2^2 + \lambda \|x - \tilde{\mathcal{D}}_\theta(x)\|_2^2,
+\]
+where the denoiser \(\tilde{\mathcal{D}}_\theta\) is a **dual-domain CRNN** (x–t and x–f) combination:
+\[
+\tilde{\mathcal{D}}_\theta(x)=\gamma\,D_{xt}(x) + (1-\gamma)\,F_t^{-1}\!\left(D_{xf}(F_t x)\right).
+\]
+:contentReference[oaicite:5]{index=5}
+
+Unrolling (K stages): at stage \(k\), apply denoising then a **CG-based data-consistency** update:
+- \(z^k = \tilde{\mathcal{D}}_\theta(x^k)\)
+- \(x^{k+1} = \arg\min_x \sum_i \|MFS_i x - y_i\|_2^2 + \lambda\|x-z^k\|_2^2\) (solved with a fixed number of CG iterations)  
+:contentReference[oaicite:6]{index=6}
 
 ---
 
-## Repository Structure
+### 2) Joint Optimization (Mask Dictionary + Reconstruction)
 
-The codebase is organized into the following main components:
+We jointly learn:
+- a set of scan-/slice-adaptive masks \(\{M_i\}\) (a *dictionary* of optimized patterns), and
+- a reconstruction network \(f_\theta\) trained across those learned patterns,
 
-- RB-ICD mask optimization
-- Dictionary-based nearest-neighbor search
-- Dynamic MRI reconstruction pipelines (MostNet, MoDL-based variants)
-- Scripts to reproduce figures and quantitative evaluation results
-
----
-
-## Planned Release
-
-🚧 The complete codebase will be released upon acceptance of the manuscript at *Magnetic Resonance in Medicine (MRM)*, in accordance with journal reproducibility guidelines.
+via **alternating optimization**: update masks for fixed reconstruction, then update \(\theta\) for fixed masks.  
+:contentReference[oaicite:7]{index=7}
 
 ---
 
-## Datasets
+### 3) RB-ICD: Randomized Subset-Based ICD (Mask Optimization)
 
-Experiments were performed using:
+Updating one phase-encoding line at a time is expensive for dynamic cine data because each candidate evaluation requires reconstructing an entire multi-frame series. RB-ICD accelerates this by **updating multiple phase-encoding locations simultaneously** (subset updates).  
+:contentReference[oaicite:8]{index=8}
 
-- Public OCMR dynamic cardiac MRI dataset  
-- In-house cardiac MRI dataset (University of Michigan)
+**Algorithm sketch (Algorithm 1 in paper):**
+- Start from an initial mask \(M_{\text{init}}\) and enforce a fixed low-frequency ACS set \(\Omega_{\text{low}}\).
+- For each pass \(j=1..N_{\text{iter}}\):
+  - Randomly partition movable sampled locations into disjoint subsets of size \(s\).
+  - For each subset:
+    - Sample \(N_{\text{cand}}\) candidate relocations to unsampled locations,
+    - Reconstruct and evaluate loss for each candidate,
+    - Accept the best candidate if it improves the current loss.  
+:contentReference[oaicite:9]{index=9}
 
 ---
 
 ## Citation
-
-If you use this code or framework in your research, please cite:
-
-```bibtex
-@article{gautam2026dsuno,
-  title={Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns},
-  author={Gautam, Siddhant and Li, Angqi and Agarwal, Prachi P. and Attili, Anil K. and Fessler, Jeffrey A. and Seiberlich, Nicole and Ravishankar, Saiprasad},
-  journal={arXiv preprint},
-  year={2026}
+If you use this code, please cite:
+```
+@article{gautam_dsuno_2026,
+  title   = {Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns},
+  author  = {Gautam, Siddhant and Li, Angqi and Agarwal, Prachi P. and Attili, Anil K. and Fessler, Jeffrey A. and Seiberlich, Nicole and Ravishankar, Saiprasad},
+  journal = {Magnetic Resonance in Medicine},
+  note    = {under review},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/XXXX.XXXXX}
 }
+```
+
+**Contact**  
+The code is provided to support reproducible research. If you have any questions about the code or have some trouble running any module of the framework, you can contact Siddhant Gautam (gautamsi@msu.edu) or Saiprasad Ravishankar (ravisha3@msu.edu).
