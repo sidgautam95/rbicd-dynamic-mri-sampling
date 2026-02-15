@@ -6,8 +6,7 @@
 
 Official Python implementation accompanying the paper:
 
-**Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili,  
-Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
+**Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili, Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
 
 *Preprint (arXiv), 2026*
 
@@ -20,9 +19,7 @@ Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar
 This work proposes a scan-adaptive framework for accelerating dynamic cardiac MRI using a dictionary of efficiently learned Cartesian undersampling patterns.
 
 Given fully sampled training dynamic MRI data, we learn a dictionary of optimized sampling masks using a randomized batched iterative coordinate descent (RB-ICD) algorithm.  
-At test time, a nearest-neighbor search in low-frequency $k$-space selects an appropriate sampling pattern for each scan.
-
-The framework enables improved reconstruction quality while maintaining practical computational efficiency.
+At test time, a nearest-neighbor search in low-frequency $k$-space selects an appropriate sampling pattern for each scan. The framework enables improved reconstruction quality while maintaining practical computational efficiency.
 
 ---
 
