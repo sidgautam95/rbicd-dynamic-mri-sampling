@@ -30,19 +30,19 @@ Dynamic cardiac cine MRI is often limited by long acquisition times. This reposi
 ### 1) MostNet: Model-Based Spatiotemporal Network (Reconstruction)
 
 MostNet reconstructs a dynamic image series \(x \in \mathbb{C}^{n \times N_t}\) from undersampled multi-coil measurements using the forward model:
-\[
+$$
 y_i = M F S_i x,
-\]
+$$
 where \(M\) is the sampling mask, \(F\) is the 2D spatial Fourier transform (per frame), and \(S_i\) is the coil sensitivity operator.  
 
 MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
-\[
+$$
 \arg\min_x \sum_{i=1}^{n_c}\|MFS_i x - y_i\|_2^2 + \lambda \|x - \tilde{\mathcal{D}}_\theta(x)\|_2^2,
-\]
+$$
 where the denoiser \(\tilde{\mathcal{D}}_\theta\) is a **dual-domain CRNN** (x–t and x–f) combination:
-\[
+$$
 \tilde{\mathcal{D}}_\theta(x)=\gamma\,D_{xt}(x) + (1-\gamma)\,F_t^{-1}\!\left(D_{xf}(F_t x)\right).
-\]
+$$
 
 Unrolling (K stages): at stage \(k\), apply denoising then a **CG-based data-consistency** update:
 - \(z^k = \tilde{\mathcal{D}}_\theta(x^k)\)
