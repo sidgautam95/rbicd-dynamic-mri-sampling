@@ -29,34 +29,34 @@ Dynamic cardiac cine MRI is often limited by long acquisition times. This reposi
 
 ### 1) MostNet: Model-Based Spatiotemporal Network (Reconstruction)
 
-MostNet reconstructs a dynamic image series \(x \in \mathbb{C}^{n \times N_t}\) from undersampled multi-coil measurements using the forward model:
+MostNet reconstructs a dynamic image series $x \in \mathbb{C}^{n \times N_t}$ from undersampled multi-coil measurements using the forward model:
 $$
 y_i = M F S_i x,
 $$
-where \(M\) is the sampling mask, \(F\) is the 2D spatial Fourier transform (per frame), and \(S_i\) is the coil sensitivity operator.  
+where $M$ is the sampling mask, $F$ is the 2D spatial Fourier transform (per frame), and $S_i$ is the coil sensitivity operator.  
 
 MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
 $$
 \arg\min_x \sum_{i=1}^{n_c}\|MFS_i x - y_i\|_2^2 + \lambda \|x - \tilde{\mathcal{D}}_\theta(x)\|_2^2,
 $$
-where the denoiser \(\tilde{\mathcal{D}}_\theta\) is a **dual-domain CRNN** (x–t and x–f) combination:
+where the denoiser $\tilde{\mathcal{D}}_\theta$ is a **dual-domain CRNN** (x–t and x–f) combination:
 $$
 \tilde{\mathcal{D}}_\theta(x)=\gamma\,D_{xt}(x) + (1-\gamma)\,F_t^{-1}\!\left(D_{xf}(F_t x)\right).
 $$
 
-Unrolling (K stages): at stage \(k\), apply denoising then a **CG-based data-consistency** update:
-- \(z^k = \tilde{\mathcal{D}}_\theta(x^k)\)
-- \(x^{k+1} = \arg\min_x \sum_i \|MFS_i x - y_i\|_2^2 + \lambda\|x-z^k\|_2^2\) (solved with a fixed number of CG iterations)  
+Unrolling (K stages): at stage $k$, apply denoising then a **CG-based data-consistency** update:
+- $z^k = \tilde{\mathcal{D}}_\theta(x^k)$
+- $x^{k+1} = \arg\min_x \sum_i \|MFS_i x - y_i\|_2^2 + \lambda\|x-z^k\|_2^2$ (solved with a fixed number of CG iterations)  
 
 ---
 
 ### 2) Joint Optimization (Mask Dictionary + Reconstruction)
 
 We jointly learn:
-- a set of scan-/slice-adaptive masks \(\{M_i\}\) (a *dictionary* of optimized patterns), and
-- a reconstruction network \(f_\theta\) trained across those learned patterns,
+- a set of scan-/slice-adaptive masks $\{M_i\}$ (a *dictionary* of optimized patterns), and
+- a reconstruction network $f_\theta$ trained across those learned patterns,
 
-via **alternating optimization**: update masks for fixed reconstruction, then update \(\theta\) for fixed masks.  
+via **alternating optimization**: update masks for fixed reconstruction, then update $\theta$ for fixed masks.  
 
 ---
 
@@ -65,11 +65,11 @@ via **alternating optimization**: update masks for fixed reconstruction, then up
 Updating one phase-encoding line at a time is expensive for dynamic cine data because each candidate evaluation requires reconstructing an entire multi-frame series. RB-ICD accelerates this by **updating multiple phase-encoding locations simultaneously** (subset updates).  
 
 **Algorithm sketch (Algorithm 1 in paper):**
-- Start from an initial mask \(M_{\text{init}}\) and enforce a fixed low-frequency ACS set \(\Omega_{\text{low}}\).
-- For each pass \(j=1..N_{\text{iter}}\):
-  - Randomly partition movable sampled locations into disjoint subsets of size \(s\).
+- Start from an initial mask $M_{\text{init}}$ and enforce a fixed low-frequency ACS set $\Omega_{\text{low}}$.
+- For each pass $j=1..N_{\text{iter}}$:
+  - Randomly partition movable sampled locations into disjoint subsets of size $s$.
   - For each subset:
-    - Sample \(N_{\text{cand}}\) candidate relocations to unsampled locations,
+    - Sample $N_{\text{cand}}$ candidate relocations to unsampled locations,
     - Reconstruct and evaluate loss for each candidate,
     - Accept the best candidate if it improves the current loss.  
 
