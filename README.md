@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![arXiv](https://img.shields.io/badge/arXiv-TBD-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
+[![arXiv](https://img.shields.io/badge/arXiv-2602.13984-b31b1b.svg)](https://arxiv.org/abs/2602.13984)
 
 Official Python implementation accompanying the paper:
 
@@ -10,7 +10,8 @@ Official Python implementation accompanying the paper:
 **Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili, Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
 *Under review at Magnetic Resonance in Medicine (MRM)*
 
-📄 **arXiv:** https://arxiv.org/abs/XXXX.XXXXX  
+📄 **arXiv:** https://arxiv.org/abs/2602.13984
+
 
 ---
 
