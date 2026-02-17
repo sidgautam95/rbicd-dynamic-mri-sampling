@@ -8,9 +8,8 @@ Official Python implementation accompanying the paper:
 
 **Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns**  
 **Siddhant Gautam**, Angqi Li, Prachi P. Agarwal, Anil K. Attili, Jeffrey A. Fessler, Nicole Seiberlich, Saiprasad Ravishankar  
-*Under review at Magnetic Resonance in Medicine (MRM); available as an arXiv preprint.*
 
-📄 **arXiv:** https://arxiv.org/abs/2602.13984
+**arXiv:** https://arxiv.org/abs/2602.13984
 
 ---
 
@@ -45,7 +44,7 @@ MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
 <p align="center">
 
 $$ 
-\underset{x}{\arg\min} \sum_{i=1}^{n_c} || M F S_i x - y_i ||_2^2 + \lambda || x - \tilde{{D}}_\theta(x) ||_2^2
+\underset{x}{\arg\min} \sum_{i=1}^{n_c} \|\|M F S_i x - y_i \|\|_2^2 + \lambda \|\|x - \tilde{{D}}_\theta(x) \|\|_2^2
 $$
 
 </p>
@@ -55,18 +54,11 @@ where the denoiser $\tilde{\mathcal{D}}_\theta$ is a **dual-domain CRNN** (x–t
 <p align="center">
 
 $$
-\tilde{{D}}_\theta(x) = \gamma\, D_{xt}(x) + (1-\gamma) F_t^{-1} (D_{xf}(F_t x)))
+\tilde{{D}}_\theta(x) = \gamma D_{xt}(x) + (1-\gamma) F_t^{-1} (D_{xf}(F_t x)))
 $$
 
 </p>
 
-**Unrolling (K stages):** at stage $k$, apply denoising followed by a CG-based data-consistency update:
-
-- $z^k = \tilde{\mathcal{D}}_\theta(x^k)$
-- $x^{k+1} = \underset{x}{\arg\min} \sum_{i=1}^{n_c} \|M F S_i x - y_i\|_2^2 + \lambda \|x - z^k\|_2^2$
-
-
----
 
 ### 2) Joint Optimization (Mask Dictionary + Reconstruction)
 
@@ -81,7 +73,7 @@ via **alternating optimization**: update masks for fixed reconstruction, then up
 
 ### 3) RB-ICD: Randomized Subset-Based ICD (Mask Optimization)
 
-Updating one phase-encoding line at a time is expensive for dynamic cine data because each candidate evaluation requires reconstructing an entire multi-frame series. RB-ICD accelerates this by **updating multiple phase-encoding locations simultaneously** (subset updates).
+Updating one phase-encoding line at a time is expensive for dynamic cine data because each candidate evaluation requires reconstructing an entire multi-frame series. RB-ICD accelerates this by updating multiple phase-encoding locations simultaneously (subset updates).
 
 **Algorithm sketch (Algorithm 1 in the paper):**
 
