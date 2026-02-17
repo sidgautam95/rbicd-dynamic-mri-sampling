@@ -45,7 +45,7 @@ MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
 <p align="center">
 
 $$ 
-\arg\min_x \sum_{i=1}^{n_c} \|M F S_i x - y_i\|_2^2 + \lambda \|x - \tilde{{D}}_\theta(x)\|_2^2
+\arg\min_x \sum_{i=1}^{n_c} ||M F S_i x - y_i\|_2^2 + \lambda \|x - \tilde{{D}}_\theta(x)||_2^2
 $$
 
 </p>
