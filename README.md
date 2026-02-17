@@ -45,7 +45,7 @@ MostNet solves a MoDL-style objective with a learned spatiotemporal prior:
 <p align="center">
 
 $$ 
-\arg\min_x \sum_{i=1}^{n_c} \| M F S_i x - y_i \|_2^2 + \lambda \big\| x - \tilde{{D}}_\theta(x) \big\|_2^2
+\underset{x}{\arg\min} \sum_{i=1}^{n_c} || M F S_i x - y_i ||_2^2 + \lambda || x - \tilde{{D}}_\theta(x) ||_2^2
 $$
 
 </p>
@@ -55,12 +55,7 @@ where the denoiser $\tilde{\mathcal{D}}_\theta$ is a **dual-domain CRNN** (x–t
 <p align="center">
 
 $$
-\tilde{\mathcal{D}}_\theta(x)
-=
-\gamma\, D_{xt}(x)
-+
-(1-\gamma)\,
-F_t^{-1}\!\left(D_{xf}(F_t x)\right)
+\tilde{{D}}_\theta(x) = \gamma\, D_{xt}(x) + (1-\gamma) F_t^{-1} (D_{xf}(F_t x)))
 $$
 
 </p>
@@ -68,13 +63,8 @@ $$
 **Unrolling (K stages):** at stage $k$, apply denoising followed by a CG-based data-consistency update:
 
 - $z^k = \tilde{\mathcal{D}}_\theta(x^k)$
-- $x^{k+1} =
-\arg\min_x
-\sum_{i=1}^{n_c}
-\|M F S_i x - y_i\|_2^2
-+ \lambda \|x - z^k\|_2^2$
+- $x^{k+1} = \underset{x}{\arg\min} \sum_{i=1}^{n_c} \|M F S_i x - y_i\|_2^2 + \lambda \|x - z^k\|_2^2$
 
-(solved with a fixed number of conjugate-gradient iterations)
 
 ---
 
@@ -82,7 +72,7 @@ $$
 
 We jointly learn:
 
-- a set of scan- and slice-adaptive masks $\{M_i\}$ (a dictionary of optimized patterns),
+- a set of scan-adaptive masks $\{M_i\}$ (a dictionary of optimized patterns),
 - a reconstruction network $f_\theta$ trained across those learned patterns,
 
 via **alternating optimization**: update masks for fixed reconstruction, then update $\theta$ for fixed masks.
