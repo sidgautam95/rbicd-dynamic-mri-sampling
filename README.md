@@ -1,6 +1,6 @@
 # dSUNO / RB-ICD for Scan-Adaptive Dynamic MRI Sampling
 
-⚠️ This repository is under active development. Additional documentation, trained models, and scripts will be released soon.
+This repository is under active development. Additional documentation, trained models, and scripts will be released soon.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
