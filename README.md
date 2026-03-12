@@ -94,13 +94,11 @@ Updating one phase-encoding line at a time is expensive for dynamic cine data be
 If you use this code, please cite:
 
 ```bibtex
-@article{gautam_dsuno_2026,
-  title   = {Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns},
-  author  = {Gautam, Siddhant and Li, Angqi and Agarwal, Prachi P. and Attili, Anil K. and Fessler, Jeffrey A. and Seiberlich, Nicole and Ravishankar, Saiprasad},
-  journal = {Magnetic Resonance in Medicine},
-  note    = {under review},
-  year    = {2026},
-  url     = {https://arxiv.org/abs/2602.13984}
+@article{gautam2026scan,
+  title={Scan-Adaptive Dynamic MRI Undersampling Using a Dictionary of Efficiently Learned Patterns},
+  author={Gautam, Siddhant and Li, Angqi and Agarwal, Prachi P and Attili, Anil K and Fessler, Jeffrey A and Seiberlich, Nicole and Ravishankar, Saiprasad},
+  journal={arXiv preprint arXiv:2602.13984},
+  year={2026}
 }
 ```
 
